@@ -23,45 +23,38 @@ Clone the repository to your local machine:
 git clone https://github.com/fatihak/PrestoDeck.git
 ```
 
-### 3. Create a Spotify App
+## 3. Create a Spotify App
 - Visit [Spotify For Developers](https://developer.spotify.com/dashboard/applications) and Sign In
 - In the Developer Dashboard, click "Create an App"
 - Give your app a Name and Description
 - For the Redirect URIs, enter`http://127.0.0.1:8080`
 - Tick the "Web API" box
 
-### 4. Generate Spotify Credentials
+## 4. Generate Spotify Credentials
 - Run the helper script to authenticate and generate your Spotify credentials:
 
   ```bash
   bash adhoc/generate_token.sh
   ```
-  > [!NOTE]
-  > This requires [Python 3](https://www.python.org/downloads/) to be installed on your system.
-
+    - Note: this requires python3 to be installed on your system
 - You'll be prompted to:
     - Enter the Client ID, Client Secret, and Redirect URI for your Spotify App.
     - Visit a URL to authorize your app and paste the redirected URL back.
     - Select a default Spotify device to control playback from PrestoDeck.
 - Once complete, copy the generated `SPOTIFY_CREDENTIALS={...}` line and store for the next steps
 
-### 5. Connect your Presto to your computer with a USB-C cable
+### 3. Connect your Presto to your computer with a USB-C cable
 
-### 6. Upload Project Files
+### 4. Upload Project Files
 - Open **Thonny IDE**, and ensure the interpreter is set to **MicroPython (Raspberry Pi Pico)**.
-- In the Files window, right-click on the root of the cloned project in the Files window and select 'Upload to /' to copy all the files to the Presto.
+- In the Files window, right clicking on the root of the cloned project in the Files window and selecting 'Upload to /' to copy all the files to the Presto
 
-  > [!NOTE]
-  > Make sure you are right-clicking on the root of the project, not a subdirectory.
-
-  <img src="./docs/thonny_upload.png" width="400" />
-
-### 7. Store Wi-Fi and Spotify Credentials
+### 5. Store Wi-Fi and Spotify Credentials
 - In Thonny, open the `secrets.py` file.
 - Replace the placeholder WIFI credentials with your SSID and password
 - Paste the SPOTIFY_CREDENTIALS= line from step #4
 
-### 8. Run the `main.py` Script
+### 6. Run the `main.py` Script
 - In Thonny, open the `main.py` file.
 - Click **Run** to launch the program, and let the beats flow!  
 
