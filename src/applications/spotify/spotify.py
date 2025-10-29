@@ -18,6 +18,7 @@ class State:
         self.is_playing = False
         self.repeat = False
         self.shuffle = False
+        self.volume = 0
         self.track = None
         self.show_controls = False
         self.exit = False
@@ -30,6 +31,7 @@ class State:
         state.is_playing = self.is_playing
         state.repeat = self.repeat
         state.shuffle = self.shuffle
+        state.volume = self.volume
         state.show_controls = self.show_controls
         state.exit = self.exit
         state.track = {'id': self.track['id']} if self.track else None # only care about track id
@@ -42,6 +44,7 @@ class State:
             self.toggle_leds == other.toggle_leds and
             self.is_playing == other.is_playing and
             self.repeat == other.repeat and
+            self.volume == other.volume and
             self.shuffle == other.shuffle and
             self.show_controls == other.show_controls and
             self.exit == other.exit and
@@ -197,6 +200,16 @@ class Spotify(BaseApp):
             self.toggle_leds(not self.state.toggle_leds)
             self.state.toggle_leds = not self.state.toggle_leds
 
+        def volume_up(self):
+            new_volume = min(self.state.volume + 10, 100)
+            self.spotify_client.set_volume(new_volume)
+            self.state.volume = new_volume
+
+        def volume_down(self):
+            new_volume = max(self.state.volume - 10, 0)
+            self.spotify_client.set_volume(new_volume)
+            self.state.volume = new_volume
+
         # --- Button configurations ---
         buttons_config = [
             ("Exit", ["exit.png"], (0, 0, 80, 80), exit_app, update_show_controls),
@@ -206,6 +219,8 @@ class Spotify(BaseApp):
             ("Toggle Shuffle", ["shuffle_on.png", "shuffle_off.png"], (self.center_x - 230, self.height - 100, 80, 100), toggle_shuffle, update_shuffle),
             ("Toggle Repeat", ["repeat_on.png", "repeat_off.png"], (self.center_x + 150, self.height - 100, 80, 100), toggle_repeat, update_repeat),
             ("Toggle Light", ["light_on.png", "light_off.png"], (self.width - 100, 0, 100, 80), toggle_lights, update_light),
+            ("Volume Up", ["volume_up.png"], (self.width - 100, 80, 100, 80), volume_up, update_show_controls),
+            ("Volume Down", ["volume_down.png"], (self.width - 100, 160, 100, 80), volume_down, update_show_controls),
             ("Toggle Controls", None, (0, 0, self.width, self.height), toggle_controls, update_always_enabled),
         ]
 
@@ -298,7 +313,7 @@ class Spotify(BaseApp):
                 self.state.latest_fetch = time.time()
                 result = fetch_state(self.spotify_client)
                 if result:
-                    device_id, self.state.track, self.state.is_playing, self.state.shuffle, self.state.repeat = result
+                    device_id, self.state.track, self.state.is_playing, self.state.shuffle, self.state.repeat, self.state.volume = result
                     if device_id:
                         self.spotify_client.session.device_id = device_id
 
@@ -329,6 +344,7 @@ def fetch_state(spotify_client):
     is_playing = False
     shuffle = False
     repeat = False
+    volume = 0
     device_id = None
     try:
         resp = spotify_client.current_playing()
@@ -336,7 +352,8 @@ def fetch_state(spotify_client):
             current_track = resp["item"]
             is_playing = resp.get("is_playing")
             shuffle = resp.get("shuffle_state")
-            repeat = resp.get("repeat_state", "off") != "off" 
+            repeat = resp.get("repeat_state", "off") != "off"
+            volume = resp["device"]["volume_percent"]
             device_id = resp["device"]["id"]
             print("Got current playing track: " + current_track.get("name"))
     except Exception as e:
@@ -354,7 +371,7 @@ def fetch_state(spotify_client):
     if not current_track:
         return None
 
-    return device_id, current_track, is_playing, shuffle, repeat
+    return device_id, current_track, is_playing, shuffle, repeat, volume
 
 def get_album_cover(track):
     """Fetches and resizes the album cover image for the given track."""

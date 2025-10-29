@@ -41,6 +41,11 @@ class SpotifyWebApiClient:
             url=f'https://api.spotify.com/v1/me/player/repeat?state={value}',
         )
     
+    def set_volume(self, volume_percent):
+        self.session.put(
+            url=f'https://api.spotify.com/v1/me/player/volume?volume_percent={volume_percent}',
+        )
+
     def next(self):
         self.session.post(
             url='https://api.spotify.com/v1/me/player/next',
